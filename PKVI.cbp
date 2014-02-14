@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="PKVI" />
+		<Option pch_mode="0" />
+		<Option compiler="gcc" />
+		<Option show_notes="0">
+			<notes>
+				<![CDATA[1. Заданная температура - отобр. неверно (226 вместо -30)
+2. Темп считывания задается 10 МГц, камера возвращает 5
+3. В техн. информации время экспозиции надо до ед. микросек.
+4. Отображать бининг как степени 2]]>
+			</notes>
+		</Option>
+		<Build>
+			<Script file="lib_finder.script" />
+			<Target title="Debug">
+				<Option output="bin/Debug/PKVI" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Debug/" />
+				<Option object_output="obj/Debug/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option host_application="gksudo" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DwxUSE_DEBUGREPORT" />
+					<Add option="-D_WXDEBUG_" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/PKVI" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/Release/" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-O2" />
+					<Add option="-O1" />
+					<Add option="-O" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="`wx-config --cxxflags`" />
+			<Add option="-Winvalid-pch" />
+			<Add option="-include wx_pch.h" />
+			<Add option="-DWX_PRECOMP" />
+			<Add option="-DGL_GLEXT_PROTOTYPES" />
+			<Add directory="/usr/local/include" />
+			<Add directory="/usr/lib/wx/include/gtk2-unicode-2.9" />
+			<Add directory="/usr/include/wx-2.9" />
+			<Add directory="mylib1" />
+		</Compiler>
+		<Linker>
+			<Add option="`wx-config --libs all`" />
+			<Add library="/home/user/uak/PKVI.wrk/mylib1/libbase.so" />
+			<Add library="/home/user/uak/PKVI.wrk/kpst_130624/kpst/libkpst.so" />
+			<Add directory="/usr/local/lib" />
+		</Linker>
+		<Unit filename="CanPanel.cpp" />
+		<Unit filename="CanPanel.h" />
+		<Unit filename="DatChoiceMain.cpp" />
+		<Unit filename="DatChoiceMain.h" />
+		<Unit filename="NetworkPanel.cpp" />
+		<Unit filename="NetworkPanel.h" />
+		<Unit filename="NewFrame.h" />
+		<Unit filename="PKVIApp.cpp" />
+		<Unit filename="PKVIApp.h" />
+		<Unit filename="PKVIDef.h" />
+		<Unit filename="PKVIMain.cpp" />
+		<Unit filename="PKVIMain.h" />
+		<Unit filename="PrProtMain.cpp" />
+		<Unit filename="PrProtMain.h" />
+		<Unit filename="ScreenWindow.cpp" />
+		<Unit filename="ScreenWindow.h" />
+		<Unit filename="SettingsDlg.cpp" />
+		<Unit filename="SettingsDlg.h" />
+		<Unit filename="can4linux.h" />
+		<Unit filename="ccan.cpp" />
+		<Unit filename="ccan.h" />
+		<Unit filename="commdef.h" />
+		<Unit filename="graylamp.xpm" />
+		<Unit filename="greenlamp.xpm" />
+		<Unit filename="pci_7841.cpp" />
+		<Unit filename="pci_7841.h" />
+		<Unit filename="redlamp.xpm" />
+		<Unit filename="version.h" />
+		<Unit filename="wx_pch.h">
+			<Option compile="1" />
+			<Option weight="0" />
+		</Unit>
+		<Unit filename="wxsmith/CanPanel.wxs" />
+		<Unit filename="wxsmith/NetworkPanel.wxs" />
+		<Unit filename="wxsmith/PKVIframe.wxs" />
+		<Unit filename="wxsmith/SettingsDlg.wxs" />
+		<Extensions>
+			<code_completion>
+				<search_path add="/usr/include/wx-2.9/wx" />
+			</code_completion>
+			<envvars />
+			<wxsmith version="1">
+				<gui name="wxWidgets" src="PKVIApp.cpp" main="PKVIFrame" init_handlers="necessary" language="CPP" />
+				<resources>
+					<wxFrame wxs="wxsmith/PKVIframe.wxs" src="PKVIMain.cpp" hdr="PKVIMain.h" name="PKVIFrame" language="CPP" />
+					<wxFrame wxs="wxsmith/NewFrame.wxs" src="NewFrame.cpp" hdr="NewFrame.h" name="NewFrame" language="CPP" />
+					<wxDialog wxs="wxsmith/SettingsDlg.wxs" src="SettingsDlg.cpp" hdr="SettingsDlg.h" name="SettingsDlg" language="CPP" />
+					<wxPanel wxs="wxsmith/NetworkPanel.wxs" src="NetworkPanel.cpp" hdr="NetworkPanel.h" name="NetworkPanel" language="CPP" />
+				</resources>
+			</wxsmith>
+			<lib_finder disable_auto="1" />
+			<debugger />
+			<AutoVersioning>
+				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
+				<Settings autoincrement="1" date_declarations="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
+				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
+			</AutoVersioning>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
