@@ -5044,8 +5044,11 @@ void PKVIFrame::VoikBZ()
     wxString cmd;
     Base base;
     base.fun_obrb(0);                       //APOI
-    extern int kpstmain();
-    kpstmain();                             //KPST
+    if (wxFile::Exists("/tmp/testVOIK.dat"))
+    {
+        extern int kpstmain();
+        kpstmain();                             //KPST
+    }
     //int code=wxExecute(cmd,wxEXEC_SYNC);
 }
 
