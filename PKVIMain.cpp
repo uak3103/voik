@@ -4676,7 +4676,8 @@ void PKVIFrame::ShowVoikRes()
                             k1=i;
                         }
                         nVoikKadr=k1;
-                        std::cout<<v_paths[k1]<<std::endl;
+                        std::cout<<"ShowVoikRes: - "<<v_paths[k1]<<" T="<<m_tob[k1]<<std::endl;
+                        std::cout<<std::endl;
                         break;
                     }
                 }
@@ -4725,17 +4726,22 @@ void PKVIFrame::VoikDlgProc()
         size_t count = v_paths.GetCount();
         for ( size_t n = 0; n < count; n++ )
         {
+            std::cout<<"VoikFiles: - "<<v_paths[n]<<std::endl;
+/*
             if (n>30) break;
             s.Printf(wxT("%d: %s\n"),
                      (int)n, v_paths[n].c_str());
 
             msg += s;
+*/
         }
+/*
         s.Printf(wxT("Filter index: %d"), FileDialog1->GetFilterIndex());
         msg += s;
 
         wxMessageDialog dialog2(this, msg, wxT("Selected files"));
         dialog2.ShowModal();
+*/
         nFile=0;
         nKadr=0;
         MARKER marker;
@@ -5042,8 +5048,64 @@ void PKVIFrame::VoikSendKadr()
 void PKVIFrame::VoikBZ()
 {
     wxString cmd;
+    char sc[100];
+    int ncam=0;
+    strcpy(sc,"");
+    double VA=0,VL=0,VR=0;
+
+    if (wxFile::Exists("/tmp/ForApoi0.dat"))        //просмотр кадров
+    {
+        ncam=m_TexInfoStruct.btCamNum-1;
+
+        double A0=0,L0=0,R0=0,A1=0,L1=0,R1=0,T0=0,T1=0;
+        if (v_paths.Count()>1)
+        {
+            BYTE* pData=new BYTE[1024];
+            wxFile f0(v_paths[0],wxFile::read);
+            if(f0.IsOpened())
+            {
+                f0.Read(pData,1024);    //читаем texinfo
+                TEX_INFO* pInfo=(TEX_INFO*)(pData+16);
+                f0.Close();
+                T0=pInfo->btExpHour*3600+pInfo->btExpMinutes*60+pInfo->btExpSeconds+pInfo->nExpMicroseconds/1000000.0+pInfo->nExposition/2000000.0;
+                A0=(pInfo->DatchA%524288)*360./524288.;
+                if(A0>215) A0=A0-360;
+                L0=(pInfo->DatchL%524288)*360./524288.;
+                R0=(pInfo->DatchR%524288)*360./524288.;
+            }
+            wxFile f1(v_paths[v_paths.Count()-1],wxFile::read);
+            if(f1.IsOpened())
+            {
+                f1.Read(pData,1024);    //читаем texinfo
+                TEX_INFO* pInfo=(TEX_INFO*)(pData+16);
+                f1.Close();
+                T1=pInfo->btExpHour*3600+pInfo->btExpMinutes*60+pInfo->btExpSeconds+pInfo->nExpMicroseconds/1000000.0+pInfo->nExposition/2000000.0;
+                A1=(pInfo->DatchA%524288)*360./524288.;
+                if(A1>215) A1=A1-360;
+                L1=(pInfo->DatchL%524288)*360./524288.;
+                R1=(pInfo->DatchR%524288)*360./524288.;
+            }
+            delete [] pData;
+            if ((T1-T0)>0.0001)
+            {
+                VA=(A1-A0)/(T1-T0);
+                VL=(L1-L0)/(T1-T0);
+                VR=(R1-R0)/(T1-T0);
+            }
+        }
+    }
+
+    if (v_paths.Count()>0)                  //скорость звезд pixels расчетная
+    {
+        char s[100];
+        strcpy(s,v_paths[0].ToAscii());
+        extern void ReadVXVYZV(char* sFile,double VA,double VL,double VR,char* sRes);
+        ReadVXVYZV(s,VA,VL,VR,sc);
+        std::cout<<sc<<std::endl;
+        //wxMessageBox(wxString(sc));
+    }
     Base base;
-    base.fun_obrb(0);                       //APOI
+    base.fun_obrb(ncam,sc);                       //APOI
     if (wxFile::Exists("/tmp/testVOIK.dat"))
     {
         extern int kpstmain();

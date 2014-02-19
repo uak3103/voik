@@ -255,7 +255,7 @@ public:
     ~Base();
 
 
-    void fun_obrb(int n);
+    void fun_obrb(int n,char* sc);
 };
 
 #endif // BASE_H

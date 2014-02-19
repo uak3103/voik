@@ -424,3 +424,121 @@ bool ReadKadr()
 	free(sobj);
     return true;
 }
+
+void ReadVXVYZV(char* sFile,double VA,double VL,double VR,char* sRes)
+{
+    int fff;
+    char *m_kadr,str[100];
+    TEX_INFO *tex_inf;
+    char *s;
+    int i,ntk,maska[5],kko=0,kzv=0;
+    double A,T;
+    
+    strcpy(sRes,"");
+    m_kadr=(char*)malloc(1024);
+    fff=open(sFile,O_RDONLY);
+    if (fff<0)
+    {
+	char se[100];
+	strcpy(se,"Error read file ");strcat(se,sFile);strcat(se,"\n");
+	printf(se);
+	return;
+    }
+    read(fff,m_kadr,1024);
+    tex_inf=(TEX_INFO*)(m_kadr+16);
+    close(fff);
+    
+    char *stanc;
+    int stani=0;
+    stanc=(char*)tex_inf->pbtReserv2;		//ŒœÕ≈“ ”‘¡Œ√……
+    stani=atoi(stanc);
+    if (stani<561||stani>602||(stani%10)>2)
+    {
+	if (!readCONFIG()) return;
+    }
+    else
+    {
+	//printf("CTAH=%s (%d)\n",stanc,stani);
+	for(i=1;i<=4;i++)
+	    RABTK[i]=1;
+	TIPST=stani/10;
+	NPORST=stani%10;
+        switch(TIPST) 
+	{
+	    case 56: MAXTK=4; break;
+	    case 57: MAXTK=4; break;
+	    case 58: MAXTK=2; break;
+	    case 59: MAXTK=2; break;
+	    case 60: MAXTK=1; break;
+	}
+	NUMRABTK=0;
+	for(i=1;i<=MAXTK;i++)
+	    NUMRABTK+=RABTK[i];
+    }
+    IMIT = IMITVU = IMITOS[OS_A] = IMITOS[OS_L] = IMITOS[OS_R] =
+    IMITAPOI = IMITCTK = 0;
+    num_komplex=2;			//ÓÔÌÂÚ ÎÔÌÏÂÎÛ·
+    
+    rvday  =tex_inf->btExpDay;
+    rvmonth=tex_inf->btExpMonth;
+    rvyear =tex_inf->btExpYear+2000;
+    rvhour =tex_inf->btExpHour;
+    rvmin  =tex_inf->btExpMinutes;
+    rvsec  =tex_inf->btExpSeconds;
+    rvtime=hms_to_rvtime(rvhour,rvmin,rvsec);
+//    printf("Date=%d.%d.%d hour=%d %s\n",rvday,rvmonth,rvyear,rvhour,ftextdump);
+    initcsn();
+    if (!initglobst(TIPST,NPORST,rvday,rvmonth,rvyear,rvhour)) return;
+//    printf("ST=%d%d\n",TIPST,NPORST);
+//    printf("D=%2d.%2d.%4d JD=%lf\n",rvday,rvmonth,rvyear,JDsea);
+    
+    T=tex_inf->btExpHour*3600+tex_inf->btExpMinutes*60+
+      tex_inf->btExpSeconds+tex_inf->nExpMicroseconds/1000000.0+tex_inf->nExposition/2000000.0;
+      
+    switch (tex_inf->btCamType)
+    {
+    case 0:s="‚ÈÎ";break;
+    case 1:s="˚Î";break;
+    case 2:s="ÏÈÎ";break;
+    case 3:s="‚Î";break;
+    }
+    A=(tex_inf->iDatchA%524288)*360./524288.;
+    if(A>215) A=A-360;
+    cd[OS_A]=A;
+    cd[OS_L]=(tex_inf->iDatchL%524288)*360./524288.;
+    cd[OS_R]=(tex_inf->iDatchR%524288)*360./524288.;
+    timecd[OS_A]=timecd[OS_L]=timecd[OS_R]=rvtime;
+    skor[OS_A]=VA;skor[OS_L]=VL;skor[OS_R]=VR;
+    ntk=tex_inf->btCamNum;		//ŒœÕ≈“ À¡Õ≈“Ÿ
+    for (i=1;i<=MAXTK;i++)
+	maska[i]=0;
+    maska[ntk]=1;
+    NUMRABTK=0;
+    for (i=1;i<=MAXTK;i++)
+    {
+	RABTK[i]=maska[i];
+	NUMRABTK+=RABTK[i];
+    }
+    int bin=0;
+    switch (tex_inf->btBinX)
+    {
+     case 0:bin=1;break;
+     case 1:bin=2;break;
+     case 2:bin=4;break;
+     case 3:bin=8;break;
+    }
+    pasbin(ntk)=bin;
+    
+    double vx,vy;       //pixels
+    get_VXVY_zv(ntk,cd[OS_A],cd[OS_L],cd[OS_R],skor[OS_A],skor[OS_L],skor[OS_L],&vx,&vy);
+    sprintf(str,"VX=%f;VY=%f;",vx,vy);
+    strcpy(sRes,str);
+    
+    printf("kadr%6d %s T=%d:%d:%d:%d A=%8.3f L=%8.3f r=%8.3f TK=%d Bin=%d T=%f RT=%f JD=%f (ZV: %s )\n",
+	tex_inf->nCadrNum,s,
+	tex_inf->btExpHour,tex_inf->btExpMinutes,tex_inf->btExpSeconds,tex_inf->nExpMicroseconds,
+	cd[OS_A],cd[OS_L],cd[OS_R],ntk,bin,T,rvtime,JDsea,sRes);
+    
+    free(m_kadr);
+    return;
+}

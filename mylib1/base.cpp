@@ -1432,7 +1432,7 @@ int Base::process_convolutions(int n)
     return n;
 }
 
-void Base::fun_obrb(int num)
+void Base::fun_obrb(int num,char* sc)
 {
     int aver[4]={0,0,0,0};
     double t_1,t_2;
@@ -1445,7 +1445,30 @@ void Base::fun_obrb(int num)
     if (OBRAB.Nkadr==0)
         return;
     is_OBRAB=1;
-    OBRAB.VXzv=OBRAB.VYzv=OBRAB.VXob=OBRAB.VYob=0;          //?????
+    OBRAB.VXzv=OBRAB.VYzv=0;
+    if ((strlen(sc)!=0) && (strstr(sc,"VX=")!=NULL) && (strstr(sc,"VY=")!=NULL))
+    {
+        char sq[100],*s1;
+        strcpy(sq,sc);
+        if ((s1=strchr(sq,'='))!=NULL)
+        {
+            s1++;
+            if (sscanf(s1,"%f",&OBRAB.VXzv)!=-1)
+            {
+                if ((s1=strchr(s1,'='))!=NULL)
+                {
+                    s1++;
+                    if (sscanf(s1,"%f",&OBRAB.VYzv)==-1)
+                        OBRAB.VYzv=0;
+                }
+            }
+        }
+    }
+    OBRAB.VXob=OBRAB.VYob=0;          //?????
+    trace("OBRAB_START ctk%d NKadr=%d, VXzv=%8.3f, VYzv=%8.3f VXob=%8.3f VYob=%8.3f\n"
+          ,num,OBRAB.Nkadr,OBRAB.VXzv,OBRAB.VYzv,OBRAB.VXob,OBRAB.VYob);
+    trace("minS=%d, Dist1=%d, Find1=%d, Dist2=%d, minResh=%d\n"
+          ,PLOSH,DISTANT1,FIND1,DISTANT2,(int)(OBRAB.Nkadr/2.+0.51));
     t_1=getmks();
     for (int iN=0;;iN++)
     {
